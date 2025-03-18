@@ -123,5 +123,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
----
-Answer from Perplexity: pplx.ai/share
+## 🙏 Acknowledgements
+
+This README file has been generated with the help of Claude 3.7 Sonnet.
