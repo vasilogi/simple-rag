@@ -69,20 +69,6 @@ For both implementations, you'll be prompted to enter your query, and the system
 2. Send this information along with your query to the language model
 3. Display the generated response
 
-## 🧩 Project Structure
-
-```bash
-.
-├── 00-simple-rag
-│   └── main.py         # Simple RAG with Jaccard similarity
-├── 01-semantic-rag
-│   └── main.py         # Semantic RAG with neural embeddings
-├── .gitignore
-├── LICENSE
-├── README.md
-└── requirements.txt    # Project dependencies
-```
-
 ## 🔍 How It Works
 
 ### Simple RAG (Jaccard Similarity)
