@@ -1,46 +1,43 @@
 """
-Demonstrate the basic principles of RAG systems.
+Simple RAG-based question answering system using semantic retrieval and local LLM inference.
+This program demonstrates a basic Retrieval-Augmented Generation (RAG) system that:
+
+1. Takes a user query
+2. Retrieves relevant context from a knowledge base using semantic similarity
+3. Sends the query plus context to a local LLM server (Ollama)
+4. Returns the generated response
+
+The system uses cross-encoders for semantic search and the Ollama API for generation.
 """
 import requests
+from sentence_transformers.cross_encoder import CrossEncoder
 
-def jaccard_similarity(query: str, document: str) -> float:
+def semantic_retrieval(
+        query: str, corpus: list[str], score_threshold: float = 0.5
+) -> list[str]:
     """
-    Calculate Jaccard similarity between a query and document.
-    
+    Retrieve relevant documents from a corpus based on semantic similarity to the query.
+
     Args:
-        query: The input query string
-        document: The document to compare against
-        
-    Returns:
-        float: Jaccard similarity score (0-1) representing text similarity
-    """
-    # normalise text
-    query = set(query.lower().split(" "))
-    document = set(document.lower().split(" "))
-
-    # calculate intersection and union
-    intersection = query.intersection(document)
-    union = query.union(document)
-
-    return len(intersection)/len(union)
-
-def retrieve(query: str, external_resources: list) -> str:
-    """
-    Retrieve the most relevant document from external resources based on query similarity.
+        query: The user question to find relevant documents for
+        corpus: List of text documents to search through
+        score_threshold: Minimum similarity score (0-1) for a document to be considered relevant
     
-    Args:
-        query: The user's question
-        external_resources: List of document strings to search through
-        
     Returns:
-        str: The document with highest similarity to the query
+        str: Concatenated string of all relevant documents that meet the threshold
     """
-    # score docs against query
-    similarities = [jaccard_similarity(query, doc) for doc in external_resources]
-    # get the index of the maximum similarity
-    max_index = similarities.index(max(similarities))
-    # return the top matching document
-    return external_resources[max_index]
+    # 1. Load a pretrained CrossEncoder model
+    model = CrossEncoder("cross-encoder/stsb-distilroberta-base")
+
+    # 2. Rank all sentences in the corpus for the query
+    ranks = model.rank(query, corpus)
+
+    # 3. Retrieve the most relevant documents
+    relevant_docs = [
+        corpus[rank["corpus_id"]] for rank in ranks if rank["score"] >= score_threshold
+    ]
+
+    return ' '.join(relevant_docs)
 
 
 def chat_complete(query: str, external_resources: list, system_prompt: str) -> str:
@@ -56,7 +53,7 @@ def chat_complete(query: str, external_resources: list, system_prompt: str) -> s
         str: The generated response from the language model
     """
     server_url = "http://localhost:11434/api/generate"
-    retrieved_context = retrieve(query, external_resources)
+    retrieved_context = semantic_retrieval(query=query, corpus=external_resources)
 
     augemented_prompt = f"""Based on the following information:
     
@@ -88,15 +85,22 @@ if __name__ == "__main__":
     SYSTEM_PROMPT = """
     You are a Python expert who replies concisely only on Python
     related questions in less than 100 words text.
+
+    You do not reply with code blocks.
+
+    Your role is to answer theoretical and technical questions just verbally.
     """
-    USER_QUERY = "Who created Python (programming language)?"
+    # USER_QUERY = "Who created Python (programming language)?"
+    USER_QUERY = "What are some use cases of Python?"
 
     knowledge_base = [
         "Python is a programming language created by Guido van Rossum in 1991.",
         "Python is known for its simplicity and readability.",
         "Python supports procedural, object-oriented, and functional programming.",
         "The Python Package Index (PyPI) is the official repository for 3rd-party Python software.",
-        "Python uses indentation to define code blocks."
+        "Python uses indentation to define code blocks.",
+        "Python can be used for developing web applications.",
+        "Python can be used for creating machine learning models."
     ]
 
     answer = chat_complete(
