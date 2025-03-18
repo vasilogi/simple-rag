@@ -95,12 +95,6 @@ def chat_complete(query: str, external_resources: list, system_prompt: str) -> s
 
 if __name__ == "__main__":
 
-    SYSTEM_PROMPT = """
-    You are a Python expert who replies concisely only on Python
-    related questions in less than 100 words text.
-    """
-    USER_QUERY = "Who created Python (programming language)?"
-
     knowledge_base = [
         "Python is a programming language created by Guido van Rossum in 1991.",
         "Python is known for its simplicity and readability.",
@@ -110,6 +104,18 @@ if __name__ == "__main__":
         "Python can be used for developing web applications.",
         "Python can be used for creating machine learning models."
     ]
+
+    SYSTEM_PROMPT = """
+    You are a Python expert who replies concisely only on Python
+    related questions in less than 100 words text.
+
+    You do not reply with code blocks.
+
+    Your role is to answer theoretical and technical questions just verbally.
+    """
+    # USER_QUERY = "Who created Python (programming language)?"
+
+    USER_QUERY = input("Ask your Local Python Assistant:")
 
     answer = chat_complete(
         query=USER_QUERY,
