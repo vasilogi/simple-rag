@@ -1,5 +1,15 @@
 """
-Demonstrate the basic principles of RAG systems.
+Simple RAG (Retrieval-Augmented Generation) system using Ollama.
+
+This program demonstrates a basic implementation of a RAG system that:
+
+1. Takes a user query
+2. Retrieves relevant information from a knowledge base using Jaccard similarity
+3. Augments the prompt with the retrieved context
+4. Sends the prompt to a local LLM via Ollama
+
+Returns the generated response.
+The system uses simple text-based similarity for retrieval and Ollama's API for text generation.
 """
 import requests
 
@@ -96,7 +106,9 @@ if __name__ == "__main__":
         "Python is known for its simplicity and readability.",
         "Python supports procedural, object-oriented, and functional programming.",
         "The Python Package Index (PyPI) is the official repository for 3rd-party Python software.",
-        "Python uses indentation to define code blocks."
+        "Python uses indentation to define code blocks.",
+        "Python can be used for developing web applications.",
+        "Python can be used for creating machine learning models."
     ]
 
     answer = chat_complete(
